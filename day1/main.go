@@ -17,16 +17,19 @@ func first() int {
 	fd, err := os.OpenFile("input.txt", os.O_RDONLY, 0755)
 	if err != nil {
 		fmt.Printf("error opening input file -> %s\n", err)
+		return 0
 	}
+	defer fd.Close()
 
 	res := 0
-	r := bufio.NewReader(io.Reader(fd))
+	reader := bufio.NewReader(io.Reader(fd))
 	for {
-		line, err := r.ReadString('\n')
+		line, err := reader.ReadString('\n')
 		if err != nil {
 			if err == io.EOF {
 				break
 			}
+			return 0
 		}
 
 		first, last := 0, 0
@@ -70,16 +73,19 @@ func second() int {
 	fd, err := os.OpenFile("input.txt", os.O_RDONLY, 0755)
 	if err != nil {
 		fmt.Printf("error opening input file -> %s\n", err)
+		return 0
 	}
+	defer fd.Close()
 
 	res := 0
-	r := bufio.NewReader(io.Reader(fd))
+	reader := bufio.NewReader(io.Reader(fd))
 	for {
-		line, err := r.ReadString('\n')
+		line, err := reader.ReadString('\n')
 		if err != nil {
 			if err == io.EOF {
 				break
 			}
+			return 0
 		}
 
 		lineLen := len(line)
