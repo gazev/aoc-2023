@@ -16,6 +16,7 @@ const (
 
 func main() {
 	fmt.Printf("result 1st: %d\n", first())
+	fmt.Printf("result 2nd: %d\n", second())
 }
 
 func first() int {
@@ -92,5 +93,80 @@ func first() int {
 		gameCount++
 	}
 
+	return res
+}
+
+func second() int {
+	fd, err := os.OpenFile("input.txt", os.O_RDONLY, 0755)
+	if err != nil {
+		fmt.Printf("error opening input file -> %s\n", err)
+		return 0
+	}
+	defer fd.Close()
+
+	reader := bufio.NewReader(io.Reader(fd))
+
+	res := 0
+	for {
+		lineB, err := reader.ReadSlice('\n')
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return 0
+		}
+
+		line := strings.Split(string(lineB), ": ")[1]
+
+		red, green, blue := 0, 0, 0
+		offset := 0
+		inExpr := false
+		currExpr := 0
+		for i := 0; i+offset < len(line); i++ {
+			char := line[i+offset]
+			if char == ' ' {
+				continue
+			} else if char == ',' {
+				inExpr = false
+				continue
+			} else if char == ';' {
+				inExpr = false
+				continue
+			} else if char == '\n' {
+				res = res + red*green*blue
+				break
+			}
+
+			if char >= '0' && char <= '9' {
+				if !inExpr {
+					inExpr = true
+					currExpr = int(char - '0')
+				} else {
+					currExpr = 10*currExpr + int(char-'0')
+				}
+				continue
+			}
+
+			// if here, we are reading the color token
+			if line[i+offset:i+offset+len("red")] == "red" {
+				offset += 2 // only two because i is already incremented
+				if currExpr > red {
+					red = currExpr
+				}
+			} else if line[i+offset:i+offset+len("blue")] == "blue" {
+				offset += 3
+				if currExpr > blue {
+					blue = currExpr
+				}
+			} else if line[i+offset:i+offset+len("green")] == "green" {
+				offset += 4
+				if currExpr > green {
+					green = currExpr
+				}
+			}
+
+			inExpr = false
+		}
+	}
 	return res
 }
